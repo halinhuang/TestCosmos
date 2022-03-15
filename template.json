@@ -2,8 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "databaseAccounts_deploymenttest_name": {
-            "defaultValue": "deploymenttest",
+        "databaseAccounts_democosmosaccount_name": {
+            "defaultValue": "democosmosaccount",
             "type": "String"
         },
         "virtualNetworks_corp_software_dev_sandbox_vnet_externalid": {
@@ -16,13 +16,10 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2021-10-15",
-            "name": "[parameters('databaseAccounts_deploymenttest_name')]",
+            "name": "[parameters('databaseAccounts_democosmosaccount_name')]",
             "location": "West US 2",
             "tags": {
                 "defaultExperience": "Core (SQL)",
-                "Project": "Wolfsburg",
-                "Environment": "Software DEV Sandbox",
-                "BusinessOwner": "Dipen",
                 "hidden-cosmos-mmspecial": ""
             },
             "kind": "GlobalDocumentDB",
@@ -32,7 +29,7 @@
             "properties": {
                 "publicNetworkAccess": "Disabled",
                 "enableAutomaticFailover": false,
-                "enableMultipleWriteLocations": false,
+                "enableMultipleWriteLocations": true,
                 "isVirtualNetworkFilterEnabled": true,
                 "virtualNetworkRules": [
                     {
@@ -49,7 +46,7 @@
                 "databaseAccountOfferType": "Standard",
                 "defaultIdentity": "FirstPartyIdentity",
                 "networkAclBypass": "None",
-                "disableLocalAuth": true,
+                "disableLocalAuth": false,
                 "consistencyPolicy": {
                     "defaultConsistencyLevel": "Session",
                     "maxIntervalInSeconds": 5,
@@ -61,13 +58,34 @@
                         "provisioningState": "Succeeded",
                         "failoverPriority": 0,
                         "isZoneRedundant": false
+                    },
+                    {
+                        "locationName": "West Central US",
+                        "provisioningState": "Succeeded",
+                        "failoverPriority": 1,
+                        "isZoneRedundant": false
                     }
                 ],
                 "cors": [],
                 "capabilities": [],
                 "ipRules": [
                     {
-                        "ipAddressOrRange": "0.0.0.0"
+                        "ipAddressOrRange": "67.41.50.145"
+                    },
+                    {
+                        "ipAddressOrRange": "104.42.195.92"
+                    },
+                    {
+                        "ipAddressOrRange": "40.76.54.131"
+                    },
+                    {
+                        "ipAddressOrRange": "52.176.6.30"
+                    },
+                    {
+                        "ipAddressOrRange": "52.169.50.45"
+                    },
+                    {
+                        "ipAddressOrRange": "52.187.184.26"
                     }
                 ],
                 "backupPolicy": {
@@ -78,34 +96,37 @@
                         "backupStorageRedundancy": "Geo"
                     }
                 },
-                "networkAclBypassResourceIds": []
+                "networkAclBypassResourceIds": [],
+                "capacity": {
+                    "totalThroughputLimit": 4000
+                }
             }
         },
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
             "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test')]",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/DemoDB')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
             ],
             "properties": {
                 "resource": {
-                    "id": "Test"
+                    "id": "DemoDB"
                 }
             }
         },
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
             "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/00000000-0000-0000-0000-000000000001')]",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/00000000-0000-0000-0000-000000000001')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Reader",
                 "type": "BuiltInRole",
                 "assignableScopes": [
-                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
                 ],
                 "permissions": [
                     {
@@ -123,15 +144,15 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
             "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/00000000-0000-0000-0000-000000000002')]",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/00000000-0000-0000-0000-000000000002')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
             ],
             "properties": {
                 "roleName": "Cosmos DB Built-in Data Contributor",
                 "type": "BuiltInRole",
                 "assignableScopes": [
-                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
                 ],
                 "permissions": [
                     {
@@ -148,23 +169,27 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
             "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer1')]",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/DemoDB/DemoContainer1')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_democosmosaccount_name'), 'DemoDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
             ],
             "properties": {
                 "resource": {
-                    "id": "MyContainer1",
+                    "id": "DemoContainer1",
+		     "throughput": 1000,
                     "indexingPolicy": {
                         "indexingMode": "consistent",
                         "automatic": true,
                         "includedPaths": [
                             {
-                                "path": "/*"
+                                "path": "/AccountID/*"
                             }
                         ],
                         "excludedPaths": [
+                            {
+                                "path": "/*"
+                            },
                             {
                                 "path": "/\"_etag\"/?"
                             }
@@ -172,7 +197,7 @@
                     },
                     "partitionKey": {
                         "paths": [
-                            "/AccountID"
+                            "/PartitionKey1"
                         ],
                         "kind": "Hash"
                     },
@@ -189,26 +214,25 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
             "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer2')]",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/DemoDB/DemoContainer2')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_democosmosaccount_name'), 'DemoDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
             ],
             "properties": {
                 "resource": {
-                    "id": "MyContainer2",
+                    "id": "DemoContainer2",
+		     "throughput": 400,
                     "indexingPolicy": {
                         "indexingMode": "consistent",
                         "automatic": true,
+						
                         "includedPaths": [
                             {
-                                "path": "/AccountID/?"
+                                "path": "/*"
                             }
                         ],
                         "excludedPaths": [
-                            {
-                                "path": "/*"
-                            },
                             {
                                 "path": "/\"_etag\"/?"
                             }
@@ -216,183 +240,7 @@
                     },
                     "partitionKey": {
                         "paths": [
-                            "/partitionKey2"
-                        ],
-                        "kind": "Hash"
-                    },
-                    "uniqueKeyPolicy": {
-                        "uniqueKeys": []
-                    },
-                    "conflictResolutionPolicy": {
-                        "mode": "LastWriterWins",
-                        "conflictResolutionPath": "/_ts"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer3')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "id": "MyContainer3",
-                    "indexingPolicy": {
-                        "indexingMode": "consistent",
-                        "automatic": true,
-                        "includedPaths": [
-                            {
-                                "path": "/AccountID/?"
-                            }
-                        ],
-                        "excludedPaths": [
-                            {
-                                "path": "/*"
-                            },
-                            {
-                                "path": "/\"_etag\"/?"
-                            }
-                        ]
-                    },
-                    "partitionKey": {
-                        "paths": [
-                            "/partitionKey3"
-                        ],
-                        "kind": "Hash"
-                    },
-                    "uniqueKeyPolicy": {
-                        "uniqueKeys": []
-                    },
-                    "conflictResolutionPolicy": {
-                        "mode": "LastWriterWins",
-                        "conflictResolutionPath": "/_ts"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer4')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "id": "MyContainer4",
-                    "indexingPolicy": {
-                        "indexingMode": "consistent",
-                        "automatic": true,
-                        "includedPaths": [
-                            {
-                                "path": "/AccountID/?"
-                            }
-                        ],
-                        "excludedPaths": [
-                            {
-                                "path": "/*"
-                            },
-                            {
-                                "path": "/\"_etag\"/?"
-                            }
-                        ]
-                    },
-                    "partitionKey": {
-                        "paths": [
-                            "/partitionKey3"
-                        ],
-                        "kind": "Hash"
-                    },
-                    "uniqueKeyPolicy": {
-                        "uniqueKeys": []
-                    },
-                    "conflictResolutionPolicy": {
-                        "mode": "LastWriterWins",
-                        "conflictResolutionPath": "/_ts"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer5')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "id": "MyContainer5",
-                    "indexingPolicy": {
-                        "indexingMode": "consistent",
-                        "automatic": true,
-                        "includedPaths": [
-                            {
-                                "path": "/AccountID/?"
-                            }
-                        ],
-                        "excludedPaths": [
-                            {
-                                "path": "/*"
-                            },
-                            {
-                                "path": "/\"_etag\"/?"
-                            }
-                        ]
-                    },
-                    "partitionKey": {
-                        "paths": [
-                            "/partitionKey5"
-                        ],
-                        "kind": "Hash"
-                    },
-                    "uniqueKeyPolicy": {
-                        "uniqueKeys": []
-                    },
-                    "conflictResolutionPolicy": {
-                        "mode": "LastWriterWins",
-                        "conflictResolutionPath": "/_ts"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(parameters('databaseAccounts_deploymenttest_name'), '/Test/MyContainer6')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_deploymenttest_name'), 'Test')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_deploymenttest_name'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "id": "MyContainer6",
-                    "indexingPolicy": {
-                        "indexingMode": "consistent",
-                        "automatic": true,
-                        "includedPaths": [
-                            {
-                                "path": "/AccountID/?"
-                            }
-                        ],
-                        "excludedPaths": [
-                            {
-                                "path": "/*"
-                            },
-                            {
-                                "path": "/\"_etag\"/?"
-                            }
-                        ]
-                    },
-                    "partitionKey": {
-                        "paths": [
-                            "/partitionKey6"
+                            "/PartitionKey2"
                         ],
                         "kind": "Hash"
                     },

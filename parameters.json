@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "databaseAccounts_deploymenttest_name": {
-            "value": "deploymenttestdemo2"
+            "value": "demodeployment2"
         },
         "virtualNetworks_corp_software_dev_sandbox_vnet_externalid": {
             "value": "/subscriptions/fe60d06e-3a11-424c-a9ce-a8df254e4fd7/resourceGroups/corp-software-dev-sandbox-vnet-rg/providers/Microsoft.Network/virtualNetworks/corp-software-dev-sandbox-vnet"
