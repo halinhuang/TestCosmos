@@ -253,6 +253,49 @@
                     }
                 }
             }
+        },
+		       {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(parameters('databaseAccounts_democosmosaccount_name'), '/DemoDB/DemoContainer3')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_democosmosaccount_name'), 'DemoDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_democosmosaccount_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "DemoContainer3",
+		     "throughput": 400,
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+						
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/PartitionKey2"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
         }
     ]
 }
